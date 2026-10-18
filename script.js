@@ -22,3 +22,49 @@ navLinks.querySelectorAll('a').forEach((link) => {
 // Automatically update the copyright year
 document.getElementById('year').textContent =
   new Date().getFullYear();
+
+
+const contactForm = document.getElementById("contact-form");
+
+if (contactForm) {
+  const submitButton = document.getElementById("submit-btn");
+  const formStatus = document.getElementById("form-status");
+
+  contactForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const originalButtonText = submitButton.textContent;
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Sending...";
+    formStatus.textContent = "";
+
+    try {
+      const response = await fetch(contactForm.action, {
+        method: "POST",
+        body: new FormData(contactForm),
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (response.ok) {
+        formStatus.textContent =
+          "Thank you! Your message has been sent.";
+        formStatus.dataset.state = "success";
+        contactForm.reset();
+      } else {
+        formStatus.textContent =
+          "Unable to send your message. Please check your form setup and try again.";
+        formStatus.dataset.state = "error";
+      }
+    } catch (error) {
+      formStatus.textContent =
+        "A network error occurred. Please try again.";
+      formStatus.dataset.state = "error";
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
+    }
+  });
+}
